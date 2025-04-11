@@ -61,8 +61,8 @@ builder.defineCatalogHandler(async function(args) {
     const goplay = new GoPlay(args.config.email, args.config.password);   
 
     if (args.extra.search) {
-        var result = await goplay.search(args.extra.search, args.type);
-        return Promise.resolve({ metas: result});
+        const metas = await goplay.search(args.extra.search, args.type);
+        return Promise.resolve({ metas: metas});
     }
    
     const metas = await goplay.getAllPrograms(args.type, args.extra.skip);
