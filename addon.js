@@ -34,7 +34,7 @@ const builder = new addonBuilder({
             idPrefixes: [idPrefix]
         }, 'stream'],
 
-    types: ['movie', 'series', 'tv'],
+    types: ['movie', 'series'],
     idPrefixes: [idPrefix],
     
     // We need config
