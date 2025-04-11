@@ -2,7 +2,7 @@ import pkg from 'stremio-addon-sdk';
 import {GoPlay, idPrefix} from './lib/goplay.js';
 
 const { addonBuilder, serveHTTP, publishToCentral } = pkg;
-const cacheMaxAge = 60;
+const cacheMaxAge = 5; //86400;
 
 // Stremio addon builder
 const builder = new addonBuilder({
@@ -13,13 +13,6 @@ const builder = new addonBuilder({
     // Properties that determine when Stremio picks this addon
     // this means your addon will be used for streams of the type movie
     catalogs: [{
-        id: 'goplay-tv',
-        name: 'GoPlay',
-        type: 'tv',
-        extra: [
-            { 'name': 'skip', 'isRequired': false },
-            { 'name': 'search', 'isRequired': false },
-        ]}, {
         id: 'goplay-series',
         name: 'GoPlay',
         type: 'series',
@@ -37,7 +30,7 @@ const builder = new addonBuilder({
 
     resources: ['catalog', {
             name: 'meta',
-            types: ['movie', 'series', 'tv'],
+            types: ['movie', 'series'],
             idPrefixes: [idPrefix]
         }, 'stream'],
 
@@ -59,7 +52,7 @@ const builder = new addonBuilder({
 // Stremio stream handler
 builder.defineStreamHandler(async function(args) { 
     const goplay = new GoPlay(args.config.email, args.config.password);
-    const stream = await goplay.getVideo(args.id);
+    const stream = await goplay.getVideo(args.id, args.type);
     return Promise.resolve({ streams: [stream], cacheMaxAge: cacheMaxAge });
 });
 
@@ -67,26 +60,20 @@ builder.defineStreamHandler(async function(args) {
 builder.defineCatalogHandler(async function(args) { 
     console.log(args);
     const goplay = new GoPlay(args.config.email, args.config.password);   
-    if (args.type == 'series') {
-        switch(args.id) {
-            case 'goplay-series':
-                return new Promise(async (resolve, reject) => 
-                    await goplay.getAllPrograms(args.extra.skip)
-                        .then((r) => resolve({ metas: r, cacheMaxAge: cacheMaxAge }))
-                        .catch((e) => reject(e)));
-        }
-    } 
-    else if (args.type == 'movie') {
-        return Promise.resolve({ metas: [] });
-    }
 
-    return Promise.resolve({ metas: [] });
+    if (args.extra.search) {
+        var result = await goplay.search(args.extra.search, args.type);
+        return Promise.resolve({ metas: result});
+    }
+   
+    const metas = await goplay.getAllPrograms(args.type, args.extra.skip);
+    return Promise.resolve({ metas: metas});
 });
 
 // Stremio stream handler
 builder.defineMetaHandler(async function(args) { 
     const goplay = new GoPlay(args.config.email, args.config.password);
-    const meta = await goplay.getMeta(args.id);
+    const meta = await goplay.getMeta(args.id, args.type);
     return Promise.resolve({ meta: meta });
 });
 
