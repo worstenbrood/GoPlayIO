@@ -6,6 +6,10 @@
             "use": "@vercel/node"
         }
     ],
+    "functions": {
+        "addon.js": {
+          "maxDuration": 60
+        },
     "routes": [
         {
             "src": "/(.*)",
