@@ -2,7 +2,7 @@ import pkg from 'stremio-addon-sdk';
 import {GoPlay, idPrefix} from './lib/goplay.js';
 
 const { addonBuilder, serveHTTP, publishToCentral } = pkg;
-const cacheMaxAge = 5; //86400;
+const cacheMaxAge = 86400;
 
 // Stremio addon builder
 const builder = new addonBuilder({
