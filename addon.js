@@ -58,7 +58,6 @@ builder.defineStreamHandler(async function(args) {
 
 // Stremio catalog handler
 builder.defineCatalogHandler(async function(args) { 
-    console.log(args);
     const goplay = new GoPlay(args.config.email, args.config.password);   
 
     if (args.extra.search) {
