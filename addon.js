@@ -1,18 +1,8 @@
 import pkg from 'stremio-addon-sdk';
-import GoPlay from './lib/goplay.js';
-const { addonBuilder, serveHTTP } = pkg;
+import {GoPlay, idPrefix} from './lib/goplay.js';
 
-const cacheMaxAge = 3600;
-const api = new GoPlay();
-
-api.getVersion()
-    .then((result) => console.log(result.version))
-    .then((result) => api.getTopPickPrograms())
-    .then((result) => {
-        console.log(result);
-        return result;
-    })
-    
+const { addonBuilder, serveHTTP, publishToCentral } = pkg;
+const cacheMaxAge = 60;
 
 // Stremio addon builder
 const builder = new addonBuilder({
@@ -22,10 +12,30 @@ const builder = new addonBuilder({
 
     // Properties that determine when Stremio picks this addon
     // this means your addon will be used for streams of the type movie
-    catalogs: [],
-    resources: ['stream'],
-    types: ['movie', 'series', 'catalog'],
-    idPrefixes: ['tt'],
+    catalogs: [{
+        id: 'goplay-series',
+        name: 'GoPlay',
+        type: 'series',
+        extra: [
+            { 'name': 'skip', 'isRequired': false },
+            { 'name': 'search', 'isRequired': false },
+        ]}, {
+        id: 'goplay-movie',
+        name: 'GoPlay',
+        type: 'movie',
+        extra: [
+            { 'name': 'skip', 'isRequired': false },
+            { 'name': 'search', 'isRequired': false },
+        ]}],
+
+    resources: ['catalog', {
+            name: 'meta',
+            types: ['movie', 'series', 'tv'],
+            idPrefixes: [idPrefix]
+        }, 'stream'],
+
+    types: ['movie', 'series', 'tv'],
+    idPrefixes: [idPrefix],
     
     // We need config
     behaviorHints: { 
@@ -41,7 +51,39 @@ const builder = new addonBuilder({
 
 // Stremio stream handler
 builder.defineStreamHandler(async function(args) { 
-    return { streams: [] };
+    console.log(args);
+    const goplay = new GoPlay(args.config.email, args.config.password);
+    const stream = await goplay.getVideo(args.id);
+    return Promise.resolve({ streams: [stream], cacheMaxAge: cacheMaxAge });
+});
+
+// Stremio catalog handler
+builder.defineCatalogHandler(async function(args) { 
+    console.log(args);
+
+    const goplay = new GoPlay(args.config.email, args.config.password);   
+    if (args.type == 'series') {
+        switch(args.id) {
+            case 'goplay-series':
+                return new Promise(async (resolve, reject) => 
+                    await goplay.getAllPrograms(args.extra.skip)
+                        .then((r) => resolve({ metas: r, cacheMaxAge: cacheMaxAge }))
+                        .catch((e) => reject(e)));
+        }
+    } 
+    else if (args.type == 'movie') {
+        return Promise.resolve({ metas: [] });
+    }
+
+    return Promise.resolve({ metas: [] });
+});
+
+// Stremio stream handler
+builder.defineMetaHandler(async function(args) { 
+    console.log(args);
+    const goplay = new GoPlay(args.config.email, args.config.password);
+    const meta = await goplay.getMeta(args.id);
+    return Promise.resolve({ meta: meta });
 });
 
 serveHTTP(builder.getInterface(), { 
