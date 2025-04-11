@@ -13,6 +13,13 @@ const builder = new addonBuilder({
     // Properties that determine when Stremio picks this addon
     // this means your addon will be used for streams of the type movie
     catalogs: [{
+        id: 'goplay-tv',
+        name: 'GoPlay',
+        type: 'tv',
+        extra: [
+            { 'name': 'skip', 'isRequired': false },
+            { 'name': 'search', 'isRequired': false },
+        ]}, {
         id: 'goplay-series',
         name: 'GoPlay',
         type: 'series',
@@ -51,7 +58,6 @@ const builder = new addonBuilder({
 
 // Stremio stream handler
 builder.defineStreamHandler(async function(args) { 
-    console.log(args);
     const goplay = new GoPlay(args.config.email, args.config.password);
     const stream = await goplay.getVideo(args.id);
     return Promise.resolve({ streams: [stream], cacheMaxAge: cacheMaxAge });
@@ -60,7 +66,6 @@ builder.defineStreamHandler(async function(args) {
 // Stremio catalog handler
 builder.defineCatalogHandler(async function(args) { 
     console.log(args);
-
     const goplay = new GoPlay(args.config.email, args.config.password);   
     if (args.type == 'series') {
         switch(args.id) {
@@ -80,7 +85,6 @@ builder.defineCatalogHandler(async function(args) {
 
 // Stremio stream handler
 builder.defineMetaHandler(async function(args) { 
-    console.log(args);
     const goplay = new GoPlay(args.config.email, args.config.password);
     const meta = await goplay.getMeta(args.id);
     return Promise.resolve({ meta: meta });
