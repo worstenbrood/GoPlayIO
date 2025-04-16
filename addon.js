@@ -66,7 +66,7 @@ builder.defineCatalogHandler(async function(args) {
     }
    
     const metas = await goplay.getAllPrograms(args.type, args.extra.skip);
-    return Promise.resolve({ metas: metas});
+    return Promise.resolve({ metas: metas });
 });
 
 // Stremio stream handler
