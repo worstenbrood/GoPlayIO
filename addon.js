@@ -73,7 +73,7 @@ builder.defineCatalogHandler(async function(args) {
         return Promise.resolve({ metas: metas});
     }
    
-    const metas = await goplay.getAllPrograms(args.type, args.extra.skip);
+    const metas = await goplay.getCatalog(args.type, args.extra.skip);
     return Promise.resolve({ metas: metas });
 });
 
