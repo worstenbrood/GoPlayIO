@@ -2,7 +2,7 @@ import pkg from 'stremio-addon-sdk';
 import {GoPlay, idPrefix} from './lib/goplay.js';
 
 const { addonBuilder, serveHTTP, publishToCentral } = pkg;
-const cacheMaxAge = 1;//86400;
+const cacheMaxAge = 86400;
 
 // Stremio addon builder
 const builder = new addonBuilder({
@@ -38,11 +38,11 @@ const builder = new addonBuilder({
 
     resources: ['catalog', {
             name: 'meta',
-            types: ['movie', 'series'],
+            types: ['movie', 'series', 'tv'],
             idPrefixes: [idPrefix]
         }, 'stream'],
 
-    types: ['movie', 'series'],
+    types: ['movie', 'series', 'tv'],
     idPrefixes: [idPrefix],
     
     // We need config
@@ -61,7 +61,7 @@ const builder = new addonBuilder({
 builder.defineStreamHandler(async function(args) { 
     const goplay = new GoPlay(args.config.email, args.config.password);
     const stream = await goplay.getVideo(args.id, args.type);
-    return Promise.resolve({ streams: [stream], cacheMaxAge: cacheMaxAge });
+    return Promise.resolve({ streams: [stream]});
 });
 
 // Stremio catalog handler
