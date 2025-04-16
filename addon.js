@@ -2,7 +2,7 @@ import pkg from 'stremio-addon-sdk';
 import {GoPlay, idPrefix} from './lib/goplay.js';
 
 const { addonBuilder, serveHTTP, publishToCentral } = pkg;
-const cacheMaxAge = 86400;
+const cacheMaxAge = 1;//86400;
 
 // Stremio addon builder
 const builder = new addonBuilder({
@@ -13,20 +13,28 @@ const builder = new addonBuilder({
     // Properties that determine when Stremio picks this addon
     // this means your addon will be used for streams of the type movie
     catalogs: [{
-        id: 'goplay-series',
-        name: 'GoPlay',
-        type: 'series',
-        extra: [
-            { 'name': 'skip', 'isRequired': false },
-            { 'name': 'search', 'isRequired': false },
+            id: 'goplay-series',
+            name: 'GoPlay',
+            type: 'series',
+            extra: [
+                { 'name': 'skip', 'isRequired': false },
+                { 'name': 'search', 'isRequired': false },
         ]}, {
-        id: 'goplay-movie',
-        name: 'GoPlay',
-        type: 'movie',
-        extra: [
-            { 'name': 'skip', 'isRequired': false },
-            { 'name': 'search', 'isRequired': false },
-        ]}],
+            id: 'goplay-movie',
+            name: 'GoPlay',
+            type: 'movie',
+            extra: [
+                { 'name': 'skip', 'isRequired': false },
+                { 'name': 'search', 'isRequired': false },
+        ]}, {
+            id: 'goplay-tv',
+            name: 'GoPlay',
+            type: 'tv',
+            extra: [
+                { 'name': 'skip', 'isRequired': false },
+                { 'name': 'search', 'isRequired': false },
+            ]}
+        ],
 
     resources: ['catalog', {
             name: 'meta',
